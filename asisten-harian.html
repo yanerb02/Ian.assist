@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Asisten">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f766e">
+<title>Asisten Harian</title>
+<link rel="icon" id="fav">
+<link rel="apple-touch-icon" id="touch">
+<link rel="manifest" id="manifest">
+<style>
+:root{--bg:#f4f7f6;--card:#fff;--tx:#12201e;--sub:#5b6b68;--ac:#0f766e;--ac2:#14b8a6;--bd:#e2e9e7;--danger:#dc2626;--warn:#d97706}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1312;--card:#14201e;--tx:#e8f1ef;--sub:#93a8a4;--bd:#223330}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--ac);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#fbbf24}
+.dot.on{background:#4ade80}
+header button{background:none;border:0;color:#fff;font-size:22px;padding:4px 8px}
+#main{max-width:820px;margin:0 auto;padding:14px 14px 110px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:var(--card);border-top:1px solid var(--bd);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;padding:8px 2px 6px;font-size:11px;color:var(--sub)}
+nav button span{display:block;font-size:22px;line-height:1.1}
+nav button.on{color:var(--ac);font-weight:600}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px 14px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:15px}
+.hero{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-radius:18px;padding:16px;margin-bottom:12px}
+.hero h2{margin:2px 0 4px;font-size:22px}.hero p{margin:0;opacity:.95}.sm{font-size:13px;opacity:.9}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--bd)}
+.card h3+.row,.card>.row:first-of-type{border-top:0}
+.grow{flex:1;min-width:0}.t{word-break:break-word}.s{font-size:13px;color:var(--sub)}
+.row.done .t{text-decoration:line-through;opacity:.55}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--ac);background:none;color:#fff;font-size:15px;flex:none;padding:0}
+.row.done .chk{background:var(--ac)}
+.x,.ic{background:none;border:0;font-size:18px;color:var(--sub);padding:4px 6px}
+.badge{font-size:11px;background:var(--danger);color:#fff;border-radius:8px;padding:1px 6px;margin-left:4px}
+input,textarea,select{width:100%;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:16px;margin-bottom:8px}
+button.pri,.btns button,.quick button{background:var(--ac);color:#fff;border:0;border-radius:12px;padding:11px 16px;font:inherit;font-weight:600}
+button.ghost{background:none!important;color:var(--ac)!important;border:1px solid var(--ac)!important}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.quick{display:flex;gap:8px;margin-bottom:12px}.quick input{margin:0}
+.empty{text-align:center;color:var(--sub);padding:18px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chips button{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:8px 12px;color:var(--tx);font-size:14px}
+.tabs{display:flex;gap:8px;margin-bottom:10px}.tabs button{flex:1;padding:8px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.chat{display:flex;flex-direction:column;min-height:calc(100dvh - 190px)}
+#log{flex:1;display:flex;flex-direction:column;gap:8px;padding-bottom:10px}
+.b{max-width:85%;padding:10px 13px;border-radius:16px;word-break:break-word}
+.b.user{align-self:flex-end;background:var(--ac);color:#fff;border-bottom-right-radius:4px}
+.b.assistant{align-self:flex-start;background:var(--card);border:1px solid var(--bd);border-bottom-left-radius:4px}
+.acts{margin-top:6px;padding-top:6px;border-top:1px dashed var(--bd);font-size:13px;color:var(--ac)}
+.cin{position:sticky;bottom:calc(62px + env(safe-area-inset-bottom));display:flex;gap:6px;align-items:flex-end;background:var(--bg);padding:6px 0}
+.cin textarea{margin:0;flex:1;max-height:120px}.cin .send{background:var(--ac);color:#fff;border:0;border-radius:12px;width:46px;height:46px;font-size:18px}
+#alerts{position:fixed;top:calc(60px + env(safe-area-inset-top));left:10px;right:10px;z-index:20;display:flex;flex-direction:column;gap:8px;max-width:600px;margin:0 auto}
+.alert{background:var(--card);border:2px solid var(--warn);border-radius:14px;padding:12px;box-shadow:0 6px 24px #0004}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;z-index:30;display:none;max-width:90%}
+details{margin:6px 0 10px}summary{color:var(--ac);font-weight:600}pre{white-space:pre-wrap;background:var(--bg);padding:10px;border-radius:10px;font-size:12px;overflow:auto}
+ol{padding-left:20px;margin:6px 0}label.chkl{display:flex;gap:8px;align-items:center;margin-bottom:8px}label.chkl input{width:auto;margin:0}
+</style>
+</head>
+<body>
+<header><h1>Asisten Harian</h1><div class="dot" id="dot"></div><button data-act="tab" data-tab="set" aria-label="Pengaturan">⚙️</button></header>
+<div id="alerts"></div>
+<div id="main"></div>
+<nav id="nav">
+<button data-act="tab" data-tab="today"><span>🏠</span>Hari ini</button>
+<button data-act="tab" data-tab="tasks"><span>✅</span>Tugas</button>
+<button data-act="tab" data-tab="rem"><span>⏰</span>Pengingat</button>
+<button data-act="tab" data-tab="memo"><span>📝</span>Memo</button>
+<button data-act="tab" data-tab="chat"><span>💬</span>Asisten</button>
+</nav>
+<div id="toast"></div>
+<input type="file" id="imp" accept="application/json" hidden>
+
+<script type="module">
+/* ============ util ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const isoLocal=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const dayStr=d=>isoLocal(d).slice(0,10);
+const nid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+function fmtD(s){if(!s)return'';const d=new Date(s.length===10?s+'T00:00':s);const o={weekday:'short',day:'numeric',month:'short'};if(s.length>10){o.hour='2-digit';o.minute='2-digit'}return d.toLocaleString('id-ID',o)}
+const fmtLong=d=>d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+let tT;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tT);tT=setTimeout(()=>t.style.display='none',3200)}
+
+/* ============ PWA: ikon + manifest tertanam ============ */
+function mkIcon(sz){const c=document.createElement('canvas');c.width=c.height=sz;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,sz,sz);gr.addColorStop(0,'#14b8a6');gr.addColorStop(1,'#0f766e');g.fillStyle=gr;g.fillRect(0,0,sz,sz);g.fillStyle='#fff';g.beginPath();g.arc(sz/2,sz/2,sz*.3,0,7);g.fill();g.strokeStyle='#0f766e';g.lineWidth=sz*.06;g.lineCap=g.lineJoin='round';g.beginPath();g.moveTo(sz*.38,sz*.5);g.lineTo(sz*.47,sz*.59);g.lineTo(sz*.63,sz*.41);g.stroke();return c.toDataURL('image/png')}
+try{const i180=mkIcon(180),i512=mkIcon(512);$('#touch').href=i180;$('#fav').href=i180;
+const mf={name:'Asisten Harian',short_name:'Asisten',start_url:location.href.split('#')[0],scope:location.href.split('#')[0].replace(/[^/]*$/,''),display:'standalone',background_color:'#0f766e',theme_color:'#0f766e',icons:[{src:i512,sizes:'512x512',type:'image/png',purpose:'any'},{src:i180,sizes:'180x180',type:'image/png'}]};
+$('#manifest').href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/manifest+json'}))}catch{}
+
+/* ============ state ============ */
+let items=LS.get('items',[]);
+let cfg=LS.get('fbcfg',null);
+let ai=LS.get('ai',{provider:'claude',key:'',model:''});
+let prof=LS.get('prof',{nama:'Ryan',konteks:'ASN di Bagian Organisasi Setda Kab. Indragiri Hulu; mengurus penyusunan dan sosialisasi SOP perangkat daerah.',speak:false});
+let chat=LS.get('chat',[]);
+let tab=LS.get('tab','today'),tfilter='aktif',busy=false,syncTxt='Mode lokal (belum terhubung)';
+const DEF={claude:'claude-haiku-5-5',gemini:'gemini-2.5-flash',openai:'gpt-4o-mini'};
+const cloud={on:false};
+function setSync(t){syncTxt=t;$('#dot').className='dot'+(cloud.on?' on':'');if(tab==='set')render()}
+
+/* ============ data layer ============ */
+function put(it){
+  it.updated=Date.now();
+  const i=items.findIndex(x=>x.id===it.id);if(i>=0)items[i]=it;else items.push(it);
+  if(cloud.on){const F=cloud.F;F.setDoc(F.doc(cloud.db,'users',cloud.uid,'items',it.id),it).catch(e=>toast('Gagal sinkron: '+e.message))}
+  else LS.set('items',items);
+  render();
+}
+function del(id){
+  items=items.filter(x=>x.id!==id);
+  if(cloud.on){const F=cloud.F;F.deleteDoc(F.doc(cloud.db,'users',cloud.uid,'items',id)).catch(e=>toast('Gagal hapus: '+e.message))}
+  else LS.set('items',items);
+  render();
+}
+const byId=id=>items.find(x=>x.id===id);
+
+/* ============ Firebase ============ */
+async function initCloud(){
+  if(!cfg){setSync('Mode lokal (belum terhubung)');return}
+  setSync('Menghubungkan…');
+  try{
+    const B='https://www.gstatic.com/firebasejs/10.12.2/';
+    const [A,Au,F]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
+    const app=A.initializeApp(cfg);
+    cloud.Au=Au;cloud.F=F;cloud.auth=Au.getAuth(app);
+    cloud.db=F.initializeFirestore(app,{localCache:F.persistentLocalCache()});
+    Au.onAuthStateChanged(cloud.auth,u=>u?startSync(u):stopSync());
+  }catch(e){setSync('Gagal terhubung: '+e.message)}
+}
+function startSync(u){
+  cloud.uid=u.uid;cloud.on=true;cloud.email=u.email;
+  const F=cloud.F;
+  if(cloud.unsub)cloud.unsub();
+  cloud.unsub=F.onSnapshot(F.collection(cloud.db,'users',u.uid,'items'),snap=>{items=snap.docs.map(d=>d.data());setSync('Tersinkron · '+u.email);render();checkDue()},err=>setSync('Error sinkron: '+err.code));
+}
+function stopSync(){if(cloud.unsub)cloud.unsub();cloud.on=false;cloud.uid=null;items=LS.get('items',[]);setSync(cfg?'Belum masuk (mode lokal)':'Mode lokal (belum terhubung)');render()}
+function parseCfg(txt){const o={};for(const m of txt.matchAll(/["']?(\w+)["']?\s*:\s*["']([^"']+)["']/g))o[m[1]]=m[2];return o.apiKey&&o.projectId?o:null}
+const errMsg=e=>({'auth/invalid-credential':'Email/kata sandi salah','auth/email-already-in-use':'Email sudah terdaftar, silakan Masuk','auth/weak-password':'Kata sandi minimal 6 karakter','auth/invalid-email':'Format email salah','auth/operation-not-allowed':'Aktifkan Email/Password di Firebase Authentication'}[e.code]||e.message);
+
+/* ============ alert pengingat ============ */
+const notified=new Set(LS.get('notified',[]));
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.value=.15;o.start();o.stop(a.currentTime+.35)}catch{}}
+function fire(x){
+  const d=document.createElement('div');d.className='alert';d.dataset.aid=x.id;
+  d.innerHTML=`<b>⏰ ${esc(x.title)}</b><div class="s">${esc(fmtD(x.at))}</div><div class="btns" style="margin:8px 0 0"><button data-act="aDone" data-id="${x.id}">Selesai</button><button class="ghost" data-act="aSnooze" data-id="${x.id}">Tunda 10 mnt</button></div>`;
+  $('#alerts').appendChild(d);beep();try{navigator.vibrate&&navigator.vibrate(200)}catch{}
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Pengingat',{body:x.title})}catch{}
+}
+function checkDue(){
+  const now=isoLocal(new Date());let n=0;
+  for(const x of items){
+    if(x.type==='reminder'&&!x.done&&x.at&&x.at<=now&&!notified.has(x.id+x.at)&&n<5){notified.add(x.id+x.at);fire(x);n++}
+  }
+  if(n)LS.set('notified',[...notified].slice(-300));
+}
+setInterval(checkDue,15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDue()});
+
+/* ============ tampilan ============ */
+const rowTask=it=>`<div class="row ${it.done?'done':''}"><button class="chk" data-act="toggle" data-id="${it.id}">${it.done?'✓':''}</button><div class="grow"><div class="t">${esc(it.title)}${it.prio==='penting'?'<span class="badge">penting</span>':''}</div><div class="s">${it.due?esc(fmtD(it.due)):'Tanpa tenggat'}</div></div><button class="x" data-act="del" data-id="${it.id}">✕</button></div>`;
+const rowRem=it=>`<div class="row ${it.done?'done':''}"><button class="chk" data-act="toggle" data-id="${it.id}">${it.done?'✓':''}</button><div class="grow"><div class="t">${esc(it.title)}</div><div class="s">${esc(fmtD(it.at))}</div></div><button class="ic" data-act="ics" data-id="${it.id}" title="Tambah ke Kalender">📅</button><button class="x" data-act="del" data-id="${it.id}">✕</button></div>`;
+const rowMemo=it=>`<div class="row"><div class="grow"><div class="t">${esc(it.text).replace(/\n/g,'<br>')}</div><div class="s">${it.from?'Dari: '+esc(it.from)+' · ':''}${esc(fmtD(dayStr(new Date(it.created))))}</div></div><button class="ic" data-act="memo2task" data-id="${it.id}" title="Jadikan tugas">✅</button><button class="x" data-act="del" data-id="${it.id}">✕</button></div>`;
+const sec=(title,arr,fn)=>arr.length?`<section class="card"><h3>${title}</h3>${arr.map(fn).join('')}</section>`:'';
+const byDue=(a,b)=>(a.due||'9')<(b.due||'9')?-1:1;
+
+function vToday(){
+  const now=new Date(),t=dayStr(now),act=items.filter(x=>!x.done);
+  const tasks=act.filter(x=>x.type==='task');
+  const late=tasks.filter(x=>x.due&&x.due<t).sort(byDue),today=tasks.filter(x=>x.due===t),free=tasks.filter(x=>!x.due);
+  const rems=act.filter(x=>x.type==='reminder'&&x.at&&x.at.slice(0,10)<=t).sort((a,b)=>a.at<b.at?-1:1);
+  const memos=items.filter(x=>x.type==='memo').sort((a,b)=>b.created-a.created).slice(0,3);
+  const h=now.getHours(),g=h<11?'Selamat pagi':h<15?'Selamat siang':h<18?'Selamat sore':'Selamat malam';
+  const n=late.length+today.length,sum=(n||rems.length)?`${n} tugas dan ${rems.length} pengingat menunggu hari ini.`:'Tidak ada yang tertunda. Santai dulu ☕';
+  return `<div class="hero"><div class="sm">${esc(fmtLong(now))}</div><h2>${g}, ${esc(prof.nama)}</h2><p>${sum}</p></div>
+  <div class="quick"><input id="qIn" placeholder="Tambah tugas cepat untuk hari ini…" data-enter="quick"><button data-act="quick">＋</button></div>
+  ${sec('⚠️ Terlambat',late,rowTask)}${sec('⏰ Pengingat',rems,rowRem)}${sec('📌 Tugas hari ini',today,rowTask)}${sec('📋 Tanpa tenggat',free.slice(0,8),rowTask)}${sec('📝 Memo terbaru',memos,rowMemo)}`;
+}
+function vTasks(){
+  const list=items.filter(x=>x.type==='task'&&(tfilter==='aktif'?!x.done:x.done)).sort((a,b)=>tfilter==='aktif'?((b.prio==='penting')-(a.prio==='penting'))||byDue(a,b):b.updated-a.updated);
+  return `<section class="card"><h3>Tugas baru</h3><input id="tTitle" placeholder="Apa yang harus dikerjakan?" data-enter="addTask"><input id="tDue" type="date"><select id="tPrio"><option value="biasa">Prioritas biasa</option><option value="penting">Penting</option></select><button class="pri" data-act="addTask">Tambah tugas</button></section>
+  <div class="tabs"><button class="${tfilter==='aktif'?'on':''}" data-act="filt" data-id="aktif">Aktif</button><button class="${tfilter==='selesai'?'on':''}" data-act="filt" data-id="selesai">Selesai</button></div>
+  ${list.length?`<section class="card">${list.map(rowTask).join('')}</section>`:'<div class="empty">Belum ada tugas.</div>'}`;
+}
+function vRem(){
+  const d=new Date(Date.now()+3600e3);d.setMinutes(0);
+  const act=items.filter(x=>x.type==='reminder'&&!x.done).sort((a,b)=>a.at<b.at?-1:1);
+  const dn=items.filter(x=>x.type==='reminder'&&x.done).sort((a,b)=>b.updated-a.updated).slice(0,8);
+  return `<section class="card"><h3>Pengingat baru</h3><input id="rTitle" placeholder="Ingatkan saya untuk…" data-enter="addRem"><input id="rAt" type="datetime-local" value="${isoLocal(d)}"><button class="pri" data-act="addRem">Tambah pengingat</button><div class="s" style="margin-top:8px">Bunyi/banner muncul saat aplikasi terbuka. Untuk alarm saat aplikasi tertutup, tekan 📅 agar masuk ke Kalender iPhone.</div></section>
+  ${act.length?`<section class="card">${act.map(rowRem).join('')}</section>`:'<div class="empty">Belum ada pengingat aktif.</div>'}${sec('Selesai',dn,rowRem)}`;
+}
+function vMemo(){
+  const list=items.filter(x=>x.type==='memo').sort((a,b)=>b.created-a.created);
+  return `<section class="card"><h3>Memo baru</h3><textarea id="mText" rows="3" placeholder="Catatan perintah/pesan yang tidak boleh lupa…"></textarea><input id="mFrom" placeholder="Dari siapa? (mis. Atasan, Ibu)"><button class="pri" data-act="addMemo">Simpan memo</button></section>
+  ${list.length?`<section class="card">${list.map(rowMemo).join('')}</section>`:'<div class="empty">Belum ada memo.</div>'}`;
+}
+function vChat(){
+  const logs=chat.length?chat.map(m=>`<div class="b ${m.role}">${esc(m.text).replace(/\n/g,'<br>')}${m.acts&&m.acts.length?`<div class="acts">${m.acts.map(a=>'✔ '+esc(a)).join('<br>')}</div>`:''}</div>`).join(''):`<div class="empty">Ngobrol atau beri perintah ke asisten.</div><div class="chips"><button data-act="chip" data-id="Apa agendaku hari ini?">Apa agendaku hari ini?</button><button data-act="chip" data-id="Ingatkan besok jam 8 pagi rapat koordinasi">Ingatkan besok jam 8 rapat</button><button data-act="chip" data-id="Catat memo dari atasan: siapkan bahan SOP untuk rapat Senin">Catat memo dari atasan</button><button data-act="chip" data-id="Tambah tugas revisi SOP, tenggat Jumat depan, penting">Tambah tugas revisi SOP</button></div>`;
+  return `<div class="chat"><div id="log">${logs}${busy?'<div class="b assistant">…</div>':''}</div><div class="cin"><button class="ic" data-act="mic">🎙️</button><textarea id="chatIn" rows="1" placeholder="Tulis atau dikte perintah…"></textarea><button class="send" data-act="send">➤</button></div></div>`;
+}
+function vSet(){
+  const sel=(v,c)=>v===c?'selected':'';
+  return `<section class="card"><h3>Sinkronisasi iPhone ↔ iPad (Firebase)</h3>
+  <p class="s">Status: <b>${esc(syncTxt)}</b></p>
+  <textarea id="fbTxt" rows="6" placeholder="Tempel firebaseConfig dari Firebase di sini">${cfg?esc(JSON.stringify(cfg,null,1)):''}</textarea>
+  <div class="btns"><button data-act="saveFb">Simpan konfigurasi</button></div>
+  <input id="em" type="email" placeholder="Email akun" autocomplete="email"><input id="pw" type="password" placeholder="Kata sandi (min. 6 karakter)" autocomplete="current-password">
+  <div class="btns"><button data-act="login">Masuk</button><button class="ghost" data-act="register">Daftar baru</button><button class="ghost" data-act="logout">Keluar</button></div>
+  <details><summary>Cara setup Firebase (sekali saja)</summary><ol>
+  <li>Buka console.firebase.google.com → buat proyek.</li>
+  <li>Build → Authentication → Sign-in method → aktifkan <b>Email/Password</b>.</li>
+  <li>Authentication → Settings → Authorized domains → tambahkan domain tempat file ini di-hosting.</li>
+  <li>Build → Firestore Database → Create database.</li>
+  <li>Tab Rules → tempel aturan di bawah → Publish.</li>
+  <li>Project settings → Your apps → ikon web (&lt;/&gt;) → salin <b>firebaseConfig</b> → tempel di kolom atas.</li>
+  <li>Daftar sekali, lalu Masuk dengan akun yang sama di iPhone dan iPad.</li></ol>
+<pre>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}</pre></details></section>
+  <section class="card"><h3>Asisten AI</h3>
+  <select id="aiP"><option value="claude" ${sel(ai.provider,'claude')}>Claude (Anthropic)</option><option value="gemini" ${sel(ai.provider,'gemini')}>Gemini (Google)</option><option value="openai" ${sel(ai.provider,'openai')}>OpenAI</option></select>
+  <input id="aiM" placeholder="Model (kosongkan untuk bawaan)" value="${esc(ai.model)}"><input id="aiK" type="password" placeholder="API key" value="${esc(ai.key)}" autocomplete="off">
+  <div class="s" style="margin-bottom:8px">API key hanya disimpan di perangkat ini (tidak ikut sinkron). Isi di iPhone dan iPad masing-masing.</div>
+  <button class="pri" data-act="saveAI">Simpan</button></section>
+  <section class="card"><h3>Profil asisten</h3><input id="pN" placeholder="Nama panggilan" value="${esc(prof.nama)}"><textarea id="pK" rows="3" placeholder="Tentang Anda (konteks untuk asisten)">${esc(prof.konteks)}</textarea>
+  <label class="chkl"><input type="checkbox" id="pS" ${prof.speak?'checked':''}> Bacakan jawaban asisten dengan suara</label><button class="pri" data-act="saveProf">Simpan</button></section>
+  <section class="card"><h3>Lainnya</h3><div class="btns"><button class="ghost" data-act="notif">Izinkan notifikasi</button><button class="ghost" data-act="clearChat">Hapus riwayat chat</button></div>
+  <div class="btns"><button class="ghost" data-act="exportD">Ekspor cadangan</button><button class="ghost" data-act="importD">Impor cadangan</button><button class="ghost" data-act="upLocal">Unggah data lokal ke cloud</button></div>
+  <div class="s">Di iPhone/iPad notifikasi hanya berbunyi saat aplikasi terbuka. Untuk pengingat penting saat aplikasi tertutup, gunakan tombol 📅 (ke Kalender).</div></section>`;
+}
+const views={today:vToday,tasks:vTasks,rem:vRem,memo:vMemo,chat:vChat,set:vSet};
+
+function render(){
+  const m=$('#main'),st={};let fid=null,ss,se;
+  m.querySelectorAll('input[id],textarea[id],select[id]').forEach(e=>{st[e.id]=e.type==='checkbox'?e.checked:e.value});
+  const a=document.activeElement;if(a&&a.id&&m.contains(a)){fid=a.id;try{ss=a.selectionStart;se=a.selectionEnd}catch{}}
+  m.innerHTML=(views[tab]||vToday)();
+  for(const[k,v]of Object.entries(st)){const e=document.getElementById(k);if(e){if(e.type==='checkbox')e.checked=v;else e.value=v}}
+  if(fid){const e=document.getElementById(fid);if(e){e.focus();try{e.setSelectionRange(ss,se)}catch{}}}
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+  if(tab==='chat'){const l=$('#log');if(l&&l.lastElementChild)l.lastElementChild.scrollIntoView({block:'end'})}
+}
+
+/* ============ AI ============ */
+function sysPrompt(){
+  const now=new Date(),act=items.filter(x=>!x.done);
+  const L=(arr,f)=>arr.slice(0,40).map(f).join('\n')||'(kosong)';
+  return `Kamu adalah asisten harian pribadi untuk ${prof.nama}. Konteks: ${prof.konteks||'-'}
+Waktu sekarang: ${now.toLocaleString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})} (${isoLocal(now)}).
+Gaya: Bahasa Indonesia, ringkas, hangat, langsung ke inti.
+
+TUGAS AKTIF:
+${L(act.filter(x=>x.type==='task'),x=>`[${x.id}] ${x.title} | tenggat ${x.due||'-'} | ${x.prio}`)}
+PENGINGAT AKTIF:
+${L(act.filter(x=>x.type==='reminder'),x=>`[${x.id}] ${x.title} | ${x.at}`)}
+MEMO:
+${L(items.filter(x=>x.type==='memo'),x=>`[${x.id}] ${x.text} | dari ${x.from||'-'}`)}
+
+Balas HANYA dengan satu objek JSON tanpa teks lain:
+{"reply":"jawaban singkat","actions":[]}
+Jenis aksi yang boleh ada di "actions":
+{"type":"add_task","title":"...","due":"YYYY-MM-DD atau kosong","prio":"biasa|penting"}
+{"type":"add_reminder","title":"...","at":"YYYY-MM-DDTHH:mm"}
+{"type":"add_memo","text":"...","from":"..."}
+{"type":"complete","id":"id yang ada di daftar"}
+{"type":"delete","id":"id yang ada di daftar"}
+Hanya buat aksi jika pengguna jelas memintanya. Hitung tanggal relatif ("besok", "Jumat depan") dari waktu sekarang. Jangan mengarang id.`;
+}
+async function callAI(hist,sys){
+  const p=ai.provider,key=ai.key,model=ai.model||DEF[p];
+  if(!key)throw new Error('API key belum diisi. Buka ⚙️ Pengaturan → Asisten AI.');
+  let r,j;
+  if(p==='claude'){
+    r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model,max_tokens:1024,system:sys,messages:hist.map(m=>({role:m.role,content:m.text}))})});
+    j=await r.json();if(!r.ok)throw new Error(j.error?.message||'Error '+r.status);return j.content.map(c=>c.text||'').join('');
+  }
+  if(p==='gemini'){
+    r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:hist.map(m=>({role:m.role==='user'?'user':'model',parts:[{text:m.text}]})),generationConfig:{responseMimeType:'application/json'}})});
+    j=await r.json();if(!r.ok)throw new Error(j.error?.message||'Error '+r.status);return j.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('')||'';
+  }
+  r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+key},body:JSON.stringify({model,response_format:{type:'json_object'},messages:[{role:'system',content:sys},...hist.map(m=>({role:m.role,content:m.text}))]})});
+  j=await r.json();if(!r.ok)throw new Error(j.error?.message||'Error '+r.status);return j.choices[0].message.content;
+}
+function parseAI(t){const m=String(t).match(/\{[\s\S]*\}/);if(m){try{const o=JSON.parse(m[0]);return{reply:String(o.reply??''),actions:Array.isArray(o.actions)?o.actions:[]}}catch{}}return{reply:String(t),actions:[]}}
+function runActions(acts){
+  const done=[];
+  for(const a of acts){try{
+    if(a.type==='add_task'&&a.title){put({id:nid(),type:'task',title:String(a.title),due:/^\d{4}-\d\d-\d\d$/.test(a.due||'')?a.due:'',prio:a.prio==='penting'?'penting':'biasa',done:false,created:Date.now()});done.push('Tugas ditambahkan: '+a.title)}
+    else if(a.type==='add_reminder'&&a.title&&/^\d{4}-\d\d-\d\dT\d\d:\d\d/.test(a.at||'')){put({id:nid(),type:'reminder',title:String(a.title),at:a.at.slice(0,16),done:false,created:Date.now()});done.push(`Pengingat: ${a.title} (${fmtD(a.at.slice(0,16))})`)}
+    else if(a.type==='add_memo'&&a.text){put({id:nid(),type:'memo',text:String(a.text),from:String(a.from||''),done:false,created:Date.now()});done.push('Memo disimpan')}
+    else if(a.type==='complete'&&byId(a.id)){const it={...byId(a.id),done:true};put(it);done.push('Selesai: '+(it.title||it.text))}
+    else if(a.type==='delete'&&byId(a.id)){const t=byId(a.id).title||'item';del(a.id);done.push('Dihapus: '+t)}
+  }catch{}}
+  return done;
+}
+function speak(t){try{if(!t)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='id-ID';speechSynthesis.speak(u)}catch{}}
+async function send(txt){
+  const el=$('#chatIn');txt=(txt??(el?el.value:'')).trim();if(!txt||busy)return;
+  if(el)el.value='';
+  chat.push({role:'user',text:txt});busy=true;render();
+  try{
+    const hist=chat.slice(-12).map(m=>({role:m.role,text:m.text}));
+    while(hist[0]&&hist[0].role!=='user')hist.shift();
+    const p=parseAI(await callAI(hist,sysPrompt()));
+    const acts=runActions(p.actions);
+    chat.push({role:'assistant',text:p.reply||'Siap.',acts});
+    if(prof.speak)speak(p.reply);
+  }catch(e){chat.push({role:'assistant',text:'⚠️ '+e.message})}
+  busy=false;chat=chat.slice(-60);LS.set('chat',chat);render();
+}
+function mic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return toast('Dikte tidak didukung di browser ini. Gunakan ikon mikrofon di keyboard.');
+  const r=new SR();r.lang='id-ID';r.onresult=e=>{const i=$('#chatIn');if(i)i.value=e.results[0][0].transcript};r.onerror=()=>toast('Dikte gagal. Gunakan ikon mikrofon di keyboard.');
+  try{r.start();toast('Silakan bicara…')}catch{}
+}
+function ics(it){
+  const d=new Date(it.at),e=new Date(d.getTime()+30*60000);
+  const f=x=>`${x.getFullYear()}${pad(x.getMonth()+1)}${pad(x.getDate())}T${pad(x.getHours())}${pad(x.getMinutes())}00`;
+  const s=it.title.replace(/[\r\n,;]/g,' ');
+  const t=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//AsistenHarian//ID','BEGIN:VEVENT',`UID:${it.id}@asisten`,`DTSTAMP:${f(new Date())}`,`DTSTART:${f(d)}`,`DTEND:${f(e)}`,`SUMMARY:${s}`,'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${s}`,'TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/calendar'}));a.download='pengingat.ics';a.click();
+}
+function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json'}));a.download=name;a.click()}
+
+/* ============ aksi ============ */
+const A={
+  tab(_,b){tab=b.dataset.tab;LS.set('tab',tab);render();scrollTo(0,0)},
+  toggle(id){const it=byId(id);if(it)put({...it,done:!it.done})},
+  del(id){if(confirm('Hapus item ini?'))del(id)},
+  filt(id){tfilter=id;render()},
+  quick(){const i=$('#qIn'),v=i.value.trim();if(!v)return;i.value='';put({id:nid(),type:'task',title:v,due:dayStr(new Date()),prio:'biasa',done:false,created:Date.now()})},
+  addTask(){const v=$('#tTitle').value.trim();if(!v)return toast('Isi judul tugas');const due=$('#tDue').value,pr=$('#tPrio').value;$('#tTitle').value='';$('#tDue').value='';put({id:nid(),type:'task',title:v,due,prio:pr,done:false,created:Date.now()})},
+  addRem(){const v=$('#rTitle').value.trim(),at=$('#rAt').value;if(!v||!at)return toast('Isi judul dan waktu');$('#rTitle').value='';put({id:nid(),type:'reminder',title:v,at,done:false,created:Date.now()})},
+  addMemo(){const v=$('#mText').value.trim();if(!v)return toast('Isi catatan memo');const f=$('#mFrom').value.trim();$('#mText').value='';$('#mFrom').value='';put({id:nid(),type:'memo',text:v,from:f,done:false,created:Date.now()})},
+  memo2task(id){const m=byId(id);if(m){put({id:nid(),type:'task',title:m.text.slice(0,120),due:'',prio:'biasa',done:false,created:Date.now()});toast('Dijadikan tugas')}},
+  ics(id){const it=byId(id);if(it)ics(it)},
+  aDone(id){const it=byId(id);if(it)put({...it,done:true});document.querySelector(`[data-aid="${id}"]`)?.remove()},
+  aSnooze(id){const it=byId(id);if(it)put({...it,at:isoLocal(new Date(Date.now()+10*60000))});document.querySelector(`[data-aid="${id}"]`)?.remove()},
+  send(){send()},chip(id){send(id)},mic(){mic()},
+  saveFb(){const c=parseCfg($('#fbTxt').value);if(!c)return toast('Konfigurasi tidak valid (butuh apiKey & projectId)');LS.set('fbcfg',c);toast('Tersimpan, memuat ulang…');setTimeout(()=>location.reload(),600)},
+  async login(){if(!cloud.Au)return toast('Simpan konfigurasi Firebase dulu');try{await cloud.Au.signInWithEmailAndPassword(cloud.auth,$('#em').value.trim(),$('#pw').value);$('#pw').value=''}catch(e){toast(errMsg(e))}},
+  async register(){if(!cloud.Au)return toast('Simpan konfigurasi Firebase dulu');try{await cloud.Au.createUserWithEmailAndPassword(cloud.auth,$('#em').value.trim(),$('#pw').value);$('#pw').value='';toast('Akun dibuat dan masuk')}catch(e){toast(errMsg(e))}},
+  async logout(){if(cloud.Au)await cloud.Au.signOut(cloud.auth)},
+  saveAI(){ai={provider:$('#aiP').value,model:$('#aiM').value.trim(),key:$('#aiK').value.trim()};LS.set('ai',ai);toast('Pengaturan AI tersimpan')},
+  saveProf(){prof={nama:$('#pN').value.trim()||'Ryan',konteks:$('#pK').value.trim(),speak:$('#pS').checked};LS.set('prof',prof);toast('Profil tersimpan')},
+  async notif(){try{const r=await Notification.requestPermission();toast('Izin notifikasi: '+r)}catch{toast('Notifikasi tidak didukung di mode ini')}},
+  clearChat(){chat=[];LS.set('chat',chat);toast('Riwayat chat dihapus');render()},
+  exportD(){download('asisten-cadangan-'+dayStr(new Date())+'.json',JSON.stringify({items,prof,v:1},null,1))},
+  importD(){$('#imp').click()},
+  upLocal(){
+    if(!cloud.on)return toast('Masuk ke akun dulu');
+    const loc=LS.get('items',[]);if(!loc.length)return toast('Tidak ada data lokal');
+    if(!confirm(`Unggah ${loc.length} item lokal ke cloud?`))return;
+    const F=cloud.F;loc.forEach(it=>F.setDoc(F.doc(cloud.db,'users',cloud.uid,'items',it.id),it));LS.set('items',[]);toast('Diunggah')
+  }
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const f=A[b.dataset.act];if(f)f(b.dataset.id,b)});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey&&e.target.dataset&&e.target.dataset.enter){e.preventDefault();A[e.target.dataset.enter]()}
+  else if(e.key==='Enter'&&!e.shiftKey&&e.target.id==='chatIn'&&!/iPhone|iPad/.test(navigator.userAgent)){e.preventDefault();send()}
+});
+$('#imp').addEventListener('change',async e=>{
+  try{const d=JSON.parse(await e.target.files[0].text());if(!Array.isArray(d.items))throw 0;d.items.forEach(it=>{if(it&&it.id&&it.type){const i=items.findIndex(x=>x.id===it.id);i>=0?items[i]=it:items.push(it);if(cloud.on){const F=cloud.F;F.setDoc(F.doc(cloud.db,'users',cloud.uid,'items',it.id),it)}}});if(!cloud.on)LS.set('items',items);toast('Impor selesai');render()}catch{toast('File cadangan tidak valid')}
+  e.target.value='';
+});
+
+render();initCloud();checkDue();
+</script>
+</body>
+</html>
